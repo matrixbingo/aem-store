@@ -1,6 +1,6 @@
-import { createContainer, getField, useContainer, useStore } from './aem-store/store';
+import { createContainer, useContainer, useStore } from './aem-store/store';
+import { getField } from './aem-store/store/util';
 
-export { default as Container } from './aem-store/store';
 export { createContainer };
 export { useContainer };
 export { useStore };

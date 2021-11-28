@@ -1,5 +1,5 @@
 ---
-title: 基本使用
+title: 基本使用 - save
 nav:
   title: 指南
   order: 3
@@ -9,4 +9,4 @@ nav:
 
 ## 基础使用
 
-<code src="../examples/base-use.tsx" />
+<code src="../examples/save-use.tsx" />

@@ -39,7 +39,7 @@ const UserEditor = () => {
   const { store: { editor }, handle } = useUserContext();
 
   const onClick = () => {
-    handle.save('editor.visible', !editor.visible);
+    handle.save({'editor.visible': !editor.visible, 'editor.item.id': 99 });
   }
   
   return <>

@@ -21,5 +21,5 @@
 .env.local
 
 # package
-/.idea
-/.history
+.idea
+.history
