@@ -1,6 +1,6 @@
 {
   "name": "aem-store",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "scripts": {
     "start": "dumi dev",
     "docs:build": "dumi build",

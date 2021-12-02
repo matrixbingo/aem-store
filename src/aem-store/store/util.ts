@@ -1,4 +1,4 @@
-import Immutable from "immutable";
+import Immutable from 'immutable';
 
 export const getField = (data: any, path: string[]) => {
   const newpath = path.concat();
@@ -13,14 +13,15 @@ export const getField = (data: any, path: string[]) => {
         v = data.getIn(p);
         if (!v) {
           // eslint-disable-next-line multiline-ternary
-          data = typeof v === 'undefined'
-            ? data?.mergeIn(
+          data =
+            typeof v === 'undefined'
+              ? data?.mergeIn(
                   p.slice(0, p.length - 1),
                   Immutable.fromJS({
                     [p[p.length - 1]]: {},
                   }),
                 )
-            : data.setIn(p, {});
+              : data.setIn(p, {});
         }
       }
     }
@@ -31,32 +32,38 @@ export const getField = (data: any, path: string[]) => {
 };
 
 export const initPath = (path: string = ''): string[] => {
-  if(path && path.length > 0){
-    return  path?.indexOf('.') >= 0 ? path.split('.') : Array.prototype.concat.call([], path);
+  if (path && path.length > 0) {
+    return path?.indexOf('.') >= 0
+      ? path.split('.')
+      : Array.prototype.concat.call([], path);
   }
   return [];
-}
+};
 
-export const initParam = (_path: string | any, _data ?: any) : { path: string; data: any}=> {
+export const initParam = (
+  _path: string | any,
+  _data?: any,
+): { path: string; data: any } => {
   const path = _data ? _path : '';
   const data = _data ? _data : _path;
-  return { path, data }
+  return { path, data };
 };
 
 /**
- * @param obj 
+ * @param obj
  * @returns number,string,boolean,undefined,object,function,symbol
  */
 export const getType = (obj: any): string => {
-  let type  = typeof obj;
-  if(type != "object"){
+  let type = typeof obj;
+  if (type != 'object') {
     return type;
   }
-  return Object.prototype.toString.call(obj).replace(/^\[object (\S+)\]$/, '$1');
-}
+  return Object.prototype.toString
+    .call(obj)
+    .replace(/^\[object (\S+)\]$/, '$1');
+};
 
 export const isSimpleType = (key: any): boolean => {
   const type = getType(key);
-  return type ==='string' ||   type ==='number';
-}
-
+  return type === 'string' || type === 'number' || type === 'boolean';
+};
