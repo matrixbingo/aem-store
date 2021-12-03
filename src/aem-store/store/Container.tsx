@@ -4,15 +4,23 @@ import { initParam, initPath, isSimpleType } from './util';
 
 export type ImmutableType = Collection<unknown, unknown>;
 
-type HandleType = Record<'delete'| 'save' | 'update' | 'merge' | 'find', ( path: string | any, data ?: any) => any> ;
+type HandleType = Record<
+  'delete' | 'save' | 'update' | 'merge' | 'find',
+  (path: string | any, data?: any) => any
+>;
 
-export interface ContextType {store:ImmutableType; handle: HandleType; dispatch: React.Dispatch<{
-  type: string;
-  data : any;
-  path: string;
-}>;}
+export interface ContextType {
+  store: ImmutableType;
+  handle: HandleType;
+  dispatch: React.Dispatch<{
+    type: string;
+    data: any;
+    path: string;
+  }>;
+}
 
-interface ContainerProps<T extends Record<string, unknown>> extends React.HTMLAttributes<HTMLElement> {
+interface ContainerProps<T extends Record<string, unknown>>
+  extends React.HTMLAttributes<HTMLElement> {
   DataContext: React.Context<ContextType>;
   initData: any;
   children: React.ReactNode;
@@ -26,7 +34,7 @@ const OPERATION = {
   FIND: 'FIND',
 };
 
-const intImmutableData = (data: any) => {
+const initImmutableData = (data: any) => {
   if (data && !isImmutable(data)) {
     return Immutable.fromJS(data);
   }
@@ -37,37 +45,42 @@ const intImmutableData = (data: any) => {
  * ex1: path: 'editor.visible', value: ture
  * ex2: path: null, value: {'editor.visible', true, 'editor.name': 'tom'}
  */
-const save = ( data: any, path: string[] = [], value: any) => {
-  if(path.length > 0){
+const save = (data: any, path: string[] = [], value: any) => {
+  if (path.length > 0) {
     if (isSimpleType(value)) {
-      return intImmutableData(data).setIn(path, value);
+      return initImmutableData(data).setIn(path, value);
     }
-    return data.setIn(path, intImmutableData(value));
-  }  
-  return Object.keys(value).reduce((acc, key)=> acc.setIn(initPath(key), intImmutableData(value[key])), data);
-}
+    return data.setIn(path, initImmutableData(value));
+  }
+  return Object.keys(value).reduce(
+    (acc, key) => acc.setIn(initPath(key), initImmutableData(value[key])),
+    data,
+  );
+};
 
-const update = ( data: any, path: string[] = [], value: any) => {
-  data = intImmutableData(data);
+const update = (data: any, path: string[] = [], value: any) => {
+  data = initImmutableData(data);
   if (isSimpleType(value)) {
     return save(data, path, value);
   }
   value = Immutable.fromJS(value);
-  return path.length > 0 ? data.mergeDeepIn(path, value): data.mergeDeep(value);
-}
+  return path.length > 0
+    ? data.mergeDeepIn(path, value)
+    : data.mergeDeep(value);
+};
 
-const merge = ( data: any, path: string[] = [], value: any) => {
-  data = intImmutableData(data);
+const merge = (data: any, path: string[] = [], value: any) => {
+  data = initImmutableData(data);
   if (isSimpleType(value)) {
     return save(data, path, value);
   }
   value = Immutable.fromJS(value);
-  return path.length > 0 ? data.mergeIn(path, value): data.merge(value);
-}
+  return path.length > 0 ? data.mergeIn(path, value) : data.merge(value);
+};
 
 const dataReducers = (
   data: any,
-  action: { type: string; data: any; path?: string; },
+  action: { type: string; data: any; path?: string },
 ): any => {
   const path = initPath(action.path);
   switch (action.type) {
@@ -89,29 +102,42 @@ const dataReducers = (
 /**
  * Create a container with `defaultValue`
  */
-const Container: FC<ContainerProps<any>> = ({ DataContext, initData, children }) => {
+const Container: FC<ContainerProps<any>> = ({
+  DataContext,
+  initData,
+  children,
+}) => {
   const reducers = useCallback(() => dataReducers, []);
 
   const [store, dispatch] = useReducer(reducers(), initData);
 
-  const handle: HandleType = useMemo(() => ({
-    delete: (path, data) => dispatch({ type: OPERATION.DELETE, ...initParam(path, data) }),
-    
-    save: (path, data) => dispatch({ type: OPERATION.SAVE, ...initParam(path, data) }),
+  const handle: HandleType = useMemo(
+    () => ({
+      delete: (path, data) =>
+        dispatch({ type: OPERATION.DELETE, ...initParam(path, data) }),
 
-    update: (path, data) =>  dispatch({ type: OPERATION.UPDATE, ...initParam(path, data) }),
+      save: (path, data) =>
+        dispatch({ type: OPERATION.SAVE, ...initParam(path, data) }),
 
-    merge: (path, data) =>  dispatch({ type: OPERATION.MERGE, ...initParam(path, data) }),
+      update: (path, data) =>
+        dispatch({ type: OPERATION.UPDATE, ...initParam(path, data) }),
 
-    find: (path, data) => dispatch({ type: OPERATION.FIND, ...initParam(path, data) }),
-  }), [dispatch]);
+      merge: (path, data) =>
+        dispatch({ type: OPERATION.MERGE, ...initParam(path, data) }),
 
-  return (
-    useMemo(() => (
+      find: (path, data) =>
+        dispatch({ type: OPERATION.FIND, ...initParam(path, data) }),
+    }),
+    [dispatch],
+  );
+
+  return useMemo(
+    () => (
       <DataContext.Provider value={{ store, handle, dispatch }}>
         {children}
       </DataContext.Provider>
-    ), [children, handle, store])
+    ),
+    [children, handle, store],
   );
 };
 
