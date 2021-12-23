@@ -1,38 +1,7 @@
 import React, { FC, useCallback, useMemo, useReducer } from 'react';
 import Immutable, { Collection, isImmutable } from 'immutable';
 import { initParam, initPath, isSimpleType } from './util';
-
-export type ImmutableType = Collection<unknown, unknown>;
-
-type HandleType = Record<
-  'delete' | 'save' | 'update' | 'merge' | 'find',
-  (path: string | any, data?: any) => any
->;
-
-export interface ContextType {
-  store: ImmutableType;
-  handle: HandleType;
-  dispatch: React.Dispatch<{
-    type: string;
-    data: any;
-    path: string;
-  }>;
-}
-
-interface ContainerProps<T extends Record<string, unknown>>
-  extends React.HTMLAttributes<HTMLElement> {
-  DataContext: React.Context<ContextType>;
-  initData: any;
-  children: React.ReactNode;
-}
-
-const OPERATION = {
-  DELETE: 'DELETE',
-  SAVE: 'SAVE',
-  UPDATE: 'UPDATE',
-  MERGE: 'MERGE',
-  FIND: 'FIND',
-};
+import { ContainerProps, HandleType, OPERATION } from '../types/type';
 
 const initImmutableData = (data: any) => {
   if (data && !isImmutable(data)) {
@@ -46,9 +15,10 @@ const initImmutableData = (data: any) => {
  * ex2: path: null, value: {'editor.visible', true, 'editor.name': 'tom'}
  */
 const save = (data: any, path: string[] = [], value: any) => {
+  data = initImmutableData(data);
   if (path.length > 0) {
     if (isSimpleType(value)) {
-      return initImmutableData(data).setIn(path, value);
+      return data.setIn(path, value);
     }
     return data.setIn(path, initImmutableData(value));
   }

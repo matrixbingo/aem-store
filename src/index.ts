@@ -1,7 +1,5 @@
 import { createContainer, useContainer, useStore } from './aem-store/store';
-import { getField } from './aem-store/store/util';
+import { ImmutableType, HandleType, ContextType } from './aem-store/types/type';
 
-export { createContainer };
-export { useContainer };
-export { useStore };
-export { getField };
+export { createContainer, useContainer, useStore };
+export { ImmutableType, HandleType, ContextType };
